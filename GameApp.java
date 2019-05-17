@@ -16,25 +16,23 @@ class Dealer implements Runnable {
 	private GameData gameData; //shared data 
 	private int numberAnnounced = 0; //it is set when a button on GUI is pressed
 		
-	/* **** DO NOT MODIFY **** this label is used by the dealer to set the game status */
+	/*this label is used by the dealer to set the game status */
 	public final JLabel lblGameStatus = new JLabel();   
 	
-	/************************** DONOT MODIFY **************************/
+	
 	public Dealer(GameData gameData) {
 		this.gameData = gameData;			
 		lblGameStatus.setAlignmentX(JLabel.CENTER_ALIGNMENT);		
 	}
 	
-	/************************* WRITE CODE FOR THIS METHOD *******************/
+	
 	public void run() {
 		
-		/* STEP-1: write code to take a lock on gameData using lock1*/ 
-		// 2 MARKS
+		/* Take a lock on gameData using lock1*/ 
 		synchronized(gameData.lock1) {			
 			
-			/* STEP-2: specify condition for player1 and specify condition for player2 */
+			/* Specify condition for player1 and specify condition for player2 */
 			// dealer executes until either (or both) players sets their playerSuccessFlag 
-			// 4 MARKS
 			while (!gameData.playerSuccessFlag[0] && !gameData.playerSuccessFlag[1]) {
 				
 				// set number announced flag to false before announcing the number
@@ -44,14 +42,13 @@ class Dealer implements Runnable {
 				gameData.playerChanceFlag[0] = false;
 				gameData.playerChanceFlag[1] = false;
 		
-				/* STEP-3: write code to take a lock on gameData using lock2 and wait while 
+				/* Write code to take a lock on gameData using lock2 and wait while 
 				 * no number has been pressed by the user on the GUI (See actionPerformed
 				 * method of the GameGUI class 
-				 * HINT: until the number is not announced the variable numberAnnounced 
+				 * Until the number is not announced the variable numberAnnounced 
 				 * remains 0 (zero)
 				 */
 				// wait while no number has been pressed by the user on the GUI 
-				// 3 MARKS
 				synchronized(gameData.lock2){			
 					while(0 == numberAnnounced){
 						try {
@@ -62,32 +59,32 @@ class Dealer implements Runnable {
 					}
 				}
 				
-				// STEP-4: initialize the announcedNumber in GameStat with the 
+				// Initialize the announcedNumber in GameStat with the 
 				// number pressed on GameGUI for the players to read
-				// 1 MARKS
+				
 				gameData.announcedNumber = numberAnnounced;
 
-				// STEP-5: reset the announced number
-				// reset the announced number
-				// 1 MARKS
+				// Reset the announced number
+				// Reset the announced number
+			
 				numberAnnounced = 0;  
 				
-				// STEP-6: communicate to the players that the number is announced
+				// Communicate to the players that the number is announced
 				// using one of the variables in GameData 
 				// set number announced to true on GameData for waiting players
-				// 1 MARKS
+				
 				gameData.noAnnouncedFlag = true;
 				
-				// STEP-7: notify all the players waiting for the number to be announced 
+				// Notify all the players waiting for the number to be announced 
 				// by the dealer using lock1 of GameData
 				// Notify all the players waiting for the number to be announced by the dealer
-				// 1 MARKS
+				
 				gameData.lock1.notifyAll();
 				
-				// STEP-8: wait using lock1 of GameData while the players haven't checked 
+				// Wait using lock1 of GameData while the players haven't checked 
 				// the numbers 								
 				// wait while the players haven't checked the numbers
-				// 6 MARKS
+				
 				while(!gameData.playerChanceFlag[0] || !gameData.playerChanceFlag[1]) {
 					try {
 						//Dealer is waiting for both the players to finish searching the 
@@ -100,18 +97,18 @@ class Dealer implements Runnable {
 			}
 			
 			
-			// STEP-9: Specify Condition to Check if Player1 has won
-			// 2 MARKS
+			// Specify Condition to Check if Player1 has won
+			
 			if(gameData.playerSuccessFlag[0] && !gameData.playerSuccessFlag[1]) { 
 				lblGameStatus.setText("PLAYER-1 HAS WON");				
 			} 
-			// STEP-10: Specify Condition to Check if Player1 has won
-			// 2 MARKS
+			// Specify Condition to Check if Player1 has won
+			
 			else if(gameData.playerSuccessFlag[1] && !gameData.playerSuccessFlag[0]){ 
 				lblGameStatus.setText("PLAYER-2 HAS WON");				
 			} 
-			// STEP-11: Specify Condition to Check if Player1 has won
-			// 2 MARKS
+			// Specify Condition to Check if Player1 has won
+			
 			else if(gameData.playerSuccessFlag[0] && gameData.playerSuccessFlag[1]) {
 				lblGameStatus.setText("BOTH PLAYER-1 AND PLAYER-2 HAVE WON");				
 			}
@@ -139,7 +136,7 @@ class Player implements Runnable {
 	// stores the numbers on the player ticket
 	private int[] ticket = new int[MAXNO];
 			
-	/************************************ DO NOT MODIFY *********************************/
+	
 	public Player(GameData gameData, int id) { 
 		
 		this.id = id; 		
@@ -177,19 +174,18 @@ class Player implements Runnable {
 	
 	/************************************ WRITE CODE FOR THIS METHOD ********************/
 	public void run() {
-		/* STEP-12: write code to take a lock on gameData using lock1 */ 
+		/* Write code to take a lock on gameData using lock1 */ 
 		// take a lock on the instance of SharedData using lock1
-		// 2 MARKS
 		synchronized(gameData.lock1) {			
 			
-			/* STEP-13: Specify condition */
+			/* Specify condition */
 			// both players execute while the game is not complete
-			// 2 MARKS
+			
 			while(!gameData.gameCompleteFlag) {
 			
-				// STEP-14: both players should wait using lock1 of GameData until a number 
+				// Both players should wait using lock1 of GameData until a number 
 				// is announced by the dealer or its not the chance of the player  
-				// 8 MARKS				  
+							  
 				while(!gameData.noAnnouncedFlag || gameData.playerChanceFlag[id]) {
 					try {
 						gameData.lock1.wait();
@@ -202,11 +198,11 @@ class Player implements Runnable {
 				// one player may have found all the numbers when the other was waiting
 				if(!gameData.gameCompleteFlag) {					
 					
-					// STEP-15: Check if the announced number is on the player's ticket
+					// Check if the announced number is on the player's ticket
 					// if the number is found, the player increments the totalNumbersFound
 					// and set the back ground color of the button to GREEN using the following statement
 					// this.btnOnTicket[i].setBackground(Color.GREEN)
-					// 7 MARKS					
+									
 					for(int i = 0; i < MAXNO; i++) {						
 						if(gameData.announcedNumber == ticket[i]) {
                             this.totalNumbersFound++;	
@@ -217,9 +213,9 @@ class Player implements Runnable {
 						}
 					}
 					
-					// STEP-16: player checks if it has won the game i.e., it has found all numbers
+					// Player checks if it has won the game i.e., it has found all numbers
 					// then it should report success
-					// 4 MARKS
+					
 					if(this.totalNumbersFound == MAXNO) {
 						// player set the success flag 
 						gameData.playerSuccessFlag[this.id] = true;						
@@ -228,8 +224,8 @@ class Player implements Runnable {
 					// player sets its chance flag 
 					gameData.playerChanceFlag[id] = true;
 					
-					// STEP-17: notify all others waiting on lock1 of GameData
-					// 2 MARKS
+					// Notify all others waiting on lock1 of GameData
+					
 					gameData.lock1.notifyAll();
 				}
 			}
@@ -299,7 +295,7 @@ class GameGUI implements ActionListener{
 		mainGameFrame.setVisible(true);
 	}
 
-	/************ DONOT MODIFY THIS CODE *************/
+	
 	/* Action taken when the user presses a button on the dealer board */
 	public void actionPerformed(ActionEvent e) {
 		// we will have to run a for loop 30 times for each time a button is pressed 
@@ -319,7 +315,7 @@ class GameGUI implements ActionListener{
 	}		
 }
 
-/**** THIS CLASS HAS THE main() METHOD - DONOT MODIFY THE CODE ****/
+
 class GameApp {
 
 	public static void main(String[] args) {
